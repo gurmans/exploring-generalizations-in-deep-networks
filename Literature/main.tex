@@ -1,0 +1,52 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{myhandout}
+\usepackage[options ]{algorithm2e}
+\usepackage{tikz}
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage{enumitem}
+
+\title{Generalisations in Neeural Network}
+\author{Gurman Singh}
+
+\begin{document}
+
+\maketitle
+
+\section{Neural Network}
+I started off by learning what neural networks are, implementing a simple neural network that gave 98\% accuracy on MNIST database.
+My network consisted of 
+\begin{enumerate}
+    \item input of $28 \times 28$ gray-scale images of handwritten digits.
+    \item two hidden layers of $200$ nodes each.
+    \item an output layer of $10$ nodes to identify the digit on the image.
+\end{enumerate}
+\section{Convolutional Neural Network}
+Convolution specifically helps us find patterns in the input. In convolution, the input channels are sent to with a set of filters. The filters are usually smaller than the input channels size.
+but since the simple Neural network was already giving us $98\%$ accuracy, we had to augment our current data to realise the power of convolution.
+\section{Data Augmentation}
+The  way we augmented the input data was that we converted a $28 \times 28$ input to $56 \times 56$ size input. We took the original image and imposed it on top of a $56 \times 56$ array of all zeroes. The position of the smaller image could be randomly anywhere over the bigger image, but it was made sure that the smaller image is always fully contained inside the bigger one.
+For starters, we only placed the smaller image on one of the four quadrants of the larger image, in order to test that if we train the network on one of the quadrants, will it be able to identify the digits on other quadrants.
+
+After some hyper parameter searching, it was able to do that with $94\%$ accuracy.
+\subsection{Search for symmetry}
+On the same trained network, we next tested images which were not in one of the quadrants, the results had the following pattern in them:
+The results were poorest at when tested for in the center and the accuracy increased as the smaller image moved to the edges of the larger image and approached to $96\%$ as the image approached the corners.
+This symmetrical result was obtained by training the network by placing the smaller image over any one of the random quadrants.
+
+When during the training, the smaller image was placed anywhere on the larger image independent of the quadrant, uniform results of $95\%$ accuracy were achieved.
+
+The most important parameter found out to be having the greatest impact was the size of the filter during the first convolution, we got the best results when the size of the filter was equal to the size of the smaller image, i.e., $28 \times 28$.
+The intuition behind keeping this size was that the network(or the first convolution layer) should be able to identify the digits from the $56 \times 56$ image.
+
+\section{The layered network}
+\subsection{Idea}
+The idea is to have some sort of structure of networks, in which each network is assigned to do a specific task and different networks work with each other and use inputs and outputs from each other to reach complex conclusions.
+In our particular case, we shall have 2 networks as follows:
+\begin{enumerate}
+    \item The first network will be a simple neural network as made in the beginning of this course which is trained to identify the $28 \times 28$ digits. It will simply take the $28 \times 28$ image as input and output what digit the image represents.
+    \item The second network will be trained to use the powers of the first network to improve the accuracy in our case of $56 \times 56$ size images. The plan is that the first filter of convolution will be mapped with the input of the first network. Once that is done, and the first filter travels over the image, every new position of the filter is sent as an input to the first network which in turn gives out an output, this whole process will give us a new channel which is the result of convolution of our $56 \times 56$ image with the first network, this output will further travel down the network including convolution and fully connected network.
+\end{enumerate}
+Once this whole network is trained, it is expected to give out even better results, and can be used to identify digits on an image of any size.
+\end{document}
